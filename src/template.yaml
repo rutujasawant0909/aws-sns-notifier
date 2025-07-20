@@ -1,0 +1,29 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: SNS Notification Service
+
+Resources:
+  NotifyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: sns-notifier
+      Runtime: python3.9
+      Handler: handler.lambda_handler
+      CodeUri: .
+      Environment:
+        Variables:
+          SNS_TOPIC_ARN: !Ref NotificationTopic
+      Events:
+        ApiTrigger:
+          Type: Api
+          Properties:
+            Path: /notify
+            Method: post
+      Policies:
+        - SNSPublishMessagePolicy:
+            TopicName: notification-topic
+
+  NotificationTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: notification-topic
